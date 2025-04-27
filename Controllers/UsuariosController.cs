@@ -38,5 +38,53 @@ namespace Login.Controllers
             return CreatedAtAction(nameof(GetUsuarios), new { id = nuevoUsuario.UsuId }, nuevoUsuario);
         }
 
+        // POST: api/usuarios/registro
+        [HttpPost("registro")]
+        public async Task<IActionResult> CrearUsuarioConRegistro([FromBody] UsuarioRegistroDTO datos)
+        {
+            if (datos == null)
+            {
+                return BadRequest("Datos inválidos.");
+            }
+
+            // Opcional: usar una transacción para que ambos inserts sean atómicos
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                var usuario = new Usuario
+                {
+                    UsuUsuario = datos.UsuUsuario,
+                    UsuCorreo = datos.UsuCorreo,
+                    UsuContrasenia = datos.UsuContrasenia,
+                    UsuEstado = 1
+                };
+
+                _context.Usuarios.Add(usuario);
+                await _context.SaveChangesAsync();
+
+                var registro = new Registro
+                {
+                    RegNombre = datos.RegNombre,
+                    RegApellido = datos.RegApellido,
+                    RegFechaNacim = datos.RegFechaNacim,
+                    RegTelefono = datos.RegTelefono,
+                    RegEstado = 1
+                };
+
+                _context.Registros.Add(registro);
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+
+                return Created("", new { usuario, registro });
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return StatusCode(500, $"Error interno: {ex.Message}");
+            }
+        }
+
     }
 }
