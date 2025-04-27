@@ -31,3 +31,4 @@ C:\Users\adria\BackendLogin\Login\obj\Debug\net9.0\refint\Login.dll
 C:\Users\adria\BackendLogin\Login\obj\Debug\net9.0\Login.pdb
 C:\Users\adria\BackendLogin\Login\obj\Debug\net9.0\Login.genruntimeconfig.cache
 C:\Users\adria\BackendLogin\Login\obj\Debug\net9.0\ref\Login.dll
+C:\Users\adria\BackendLogin\Login\obj\Debug\net9.0\Login.sourcelink.json
