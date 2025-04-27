@@ -62,6 +62,27 @@ namespace Login.Controllers
             return CreatedAtAction(nameof(GetRegistros), new { id = nuevoRegistro.RegId }, nuevoRegistro);
         }
 
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
+        {
+            if (loginModel == null || (string.IsNullOrEmpty(loginModel.Usuario) && string.IsNullOrEmpty(loginModel.Correo)) || string.IsNullOrEmpty(loginModel.Contrasenia))
+            {
+                return BadRequest("Datos inválidos.");
+            }
+
+            // Buscar por Usuario o Correo
+            var usuario = await _context.Usuarios
+                .FirstOrDefaultAsync(u => u.UsuUsuario == loginModel.Usuario || u.UsuCorreo == loginModel.Correo);
+
+            if (usuario == null || usuario.UsuContrasenia != loginModel.Contrasenia)
+            {
+                return Unauthorized("Credenciales incorrectas.");
+            }
+
+            // Aquí puedes agregar la lógica para generar un JWT si es necesario, o algún otro tipo de autenticación.
+
+            return Ok(new { mensaje = "Inicio de sesión exitoso", usuario = usuario });
+        }
 
     }
 }
