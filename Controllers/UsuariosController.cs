@@ -23,8 +23,17 @@ namespace Login.Controllers
             return await _context.Usuarios.ToListAsync();
         }
 
+        // GET: api/registros
+        [HttpGet("registros")]
+        public async Task<ActionResult<IEnumerable<Registro>>> GetRegistros()
+        {
+            var registros = await _context.Registros.ToListAsync(); // Obtener todos los registros
+            return Ok(registros); // Retornar los registros
+        }
+
+
         // POST: api/usuarios
-        [HttpPost]
+        [HttpPost("crearUsuario")]
         public async Task<ActionResult<Usuario>> CrearUsuario([FromBody] Usuario nuevoUsuario)
         {
             if (nuevoUsuario == null)
@@ -38,53 +47,21 @@ namespace Login.Controllers
             return CreatedAtAction(nameof(GetUsuarios), new { id = nuevoUsuario.UsuId }, nuevoUsuario);
         }
 
-        // POST: api/usuarios/registro
+        // POST: api/registros
         [HttpPost("registro")]
-        public async Task<IActionResult> CrearUsuarioConRegistro([FromBody] UsuarioRegistroDTO datos)
+        public async Task<IActionResult> CrearRegistro([FromBody] Registro nuevoRegistro)
         {
-            if (datos == null)
+            if (nuevoRegistro == null)
             {
                 return BadRequest("Datos inválidos.");
             }
 
-            // Opcional: usar una transacción para que ambos inserts sean atómicos
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            _context.Registros.Add(nuevoRegistro);
+            await _context.SaveChangesAsync();
 
-            try
-            {
-                var usuario = new Usuario
-                {
-                    UsuUsuario = datos.UsuUsuario,
-                    UsuCorreo = datos.UsuCorreo,
-                    UsuContrasenia = datos.UsuContrasenia,
-                    UsuEstado = 1
-                };
-
-                _context.Usuarios.Add(usuario);
-                await _context.SaveChangesAsync();
-
-                var registro = new Registro
-                {
-                    RegNombre = datos.RegNombre,
-                    RegApellido = datos.RegApellido,
-                    RegFechaNacim = datos.RegFechaNacim,
-                    RegTelefono = datos.RegTelefono,
-                    RegEstado = 1
-                };
-
-                _context.Registros.Add(registro);
-                await _context.SaveChangesAsync();
-
-                await transaction.CommitAsync();
-
-                return Created("", new { usuario, registro });
-            }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                return StatusCode(500, $"Error interno: {ex.Message}");
-            }
+            return CreatedAtAction(nameof(GetRegistros), new { id = nuevoRegistro.RegId }, nuevoRegistro);
         }
+
 
     }
 }

@@ -16,13 +16,14 @@ namespace Login.Models
         [Column("reg_apellido")]
         public string? RegApellido { get; set; }
 
-        [Column("reg_fechaNacim")]
-        public DateTime RegFechaNacim { get; set; }
-
         [Column("reg_telefono")]
         public string? RegTelefono { get; set; }
 
         [Column("reg_estado")]
         public int RegEstado { get; set; } = 1;
+
+        [Column("reg_fechaNacimiento")]
+        public string? RegFechaNacimiento { get; set; }
+
     }
 }
