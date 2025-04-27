@@ -22,5 +22,21 @@ namespace Login.Controllers
         {
             return await _context.Usuarios.ToListAsync();
         }
+
+        // POST: api/usuarios
+        [HttpPost]
+        public async Task<ActionResult<Usuario>> CrearUsuario([FromBody] Usuario nuevoUsuario)
+        {
+            if (nuevoUsuario == null)
+            {
+                return BadRequest("Datos de usuario inválidos.");
+            }
+
+            _context.Usuarios.Add(nuevoUsuario);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetUsuarios), new { id = nuevoUsuario.UsuId }, nuevoUsuario);
+        }
+
     }
 }
