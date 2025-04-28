@@ -65,24 +65,36 @@ namespace Login.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
         {
-            if (loginModel == null || (string.IsNullOrEmpty(loginModel.Usuario) && string.IsNullOrEmpty(loginModel.Correo)) || string.IsNullOrEmpty(loginModel.Contrasenia))
+            // Validación de los datos entrantes
+            if (loginModel == null || string.IsNullOrEmpty(loginModel.Correo) || string.IsNullOrEmpty(loginModel.Contrasenia))
             {
-                return BadRequest("Datos inválidos.");
+                return BadRequest("Por favor, ingrese correo y contraseña.");
             }
 
-            // Buscar por Usuario o Correo
+            // Buscar al usuario por correo electrónico
             var usuario = await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.UsuUsuario == loginModel.Usuario || u.UsuCorreo == loginModel.Correo);
+                .FirstOrDefaultAsync(u => u.UsuCorreo == loginModel.Correo);
 
-            if (usuario == null || usuario.UsuContrasenia != loginModel.Contrasenia)
+            if (usuario == null)
             {
-                return Unauthorized("Credenciales incorrectas.");
+                return Unauthorized("Correo no encontrado.");
             }
 
-            // Aquí puedes agregar la lógica para generar un JWT si es necesario, o algún otro tipo de autenticación.
+            // Log de las contraseñas para depuración
+            Console.WriteLine("Contraseña ingresada: '" + loginModel.Contrasenia + "' (tamaño: " + loginModel.Contrasenia.Length + ")");
+            Console.WriteLine("Contraseña almacenada: '" + usuario.UsuContrasenia + "' (tamaño: " + usuario.UsuContrasenia.Length + ")");
 
+            // Verificar la contraseña
+            if (usuario.UsuContrasenia.Trim() != loginModel.Contrasenia.Trim()) // Comparación sin espacios
+            {
+                return Unauthorized("Contraseña incorrecta.");
+            }
+
+
+            // Si todo es correcto, devolver un mensaje de éxito
             return Ok(new { mensaje = "Inicio de sesión exitoso", usuario = usuario });
         }
+
 
     }
 }
