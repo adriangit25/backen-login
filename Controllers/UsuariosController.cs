@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Login.Data;
 using Login.Models;
+using Microsoft.AspNetCore.Authorization;  // Asegúrate de importar este espacio de nombres
 
 namespace Login.Controllers
 {
@@ -18,6 +19,7 @@ namespace Login.Controllers
 
         // GET: api/usuarios
         [HttpGet]
+        [Authorize]  // Agregar [Authorize] para proteger la ruta
         public async Task<ActionResult<IEnumerable<Usuario>>> GetUsuarios()
         {
             return await _context.Usuarios.ToListAsync();
@@ -25,15 +27,16 @@ namespace Login.Controllers
 
         // GET: api/registros
         [HttpGet("registros")]
+        [Authorize]  // Agregar [Authorize] para proteger la ruta
         public async Task<ActionResult<IEnumerable<Registro>>> GetRegistros()
         {
             var registros = await _context.Registros.ToListAsync(); // Obtener todos los registros
             return Ok(registros); // Retornar los registros
         }
 
-
         // POST: api/usuarios
         [HttpPost("crearUsuario")]
+        [Authorize]  // Agregar [Authorize] para proteger la ruta
         public async Task<ActionResult<Usuario>> CrearUsuario([FromBody] Usuario nuevoUsuario)
         {
             if (nuevoUsuario == null)
@@ -49,6 +52,7 @@ namespace Login.Controllers
 
         // POST: api/registros
         [HttpPost("registro")]
+        [Authorize]  // Agregar [Authorize] para proteger la ruta
         public async Task<IActionResult> CrearRegistro([FromBody] Registro nuevoRegistro)
         {
             if (nuevoRegistro == null)
@@ -62,40 +66,9 @@ namespace Login.Controllers
             return CreatedAtAction(nameof(GetRegistros), new { id = nuevoRegistro.RegId }, nuevoRegistro);
         }
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
-        {
-            // Validación de los datos entrantes
-            if (loginModel == null || string.IsNullOrEmpty(loginModel.Correo) || string.IsNullOrEmpty(loginModel.Contrasenia))
-            {
-                return BadRequest("Por favor, ingrese correo y contraseña.");
-            }
-
-            // Buscar al usuario por correo electrónico
-            var usuario = await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.UsuCorreo == loginModel.Correo);
-
-            if (usuario == null)
-            {
-                return Unauthorized("Correo no encontrado.");
-            }
-
-            // Log de las contraseñas para depuración (seguro)
-            Console.WriteLine("Contraseña ingresada: '" + loginModel.Contrasenia + "' (tamaño: " + loginModel.Contrasenia.Length + ")");
-            Console.WriteLine("Contraseña almacenada: '" + usuario.UsuContrasenia + "' (tamaño: " + (usuario.UsuContrasenia?.Length ?? 0) + ")");
-
-            // Verificar la contraseña (seguro con ?.Trim())
-            if (usuario.UsuContrasenia?.Trim() != loginModel.Contrasenia?.Trim()) // Comparación sin espacios
-            {
-                return Unauthorized("Contraseña incorrecta.");
-            }
-
-            // Si todo es correcto, devolver un mensaje de éxito
-            return Ok(new { mensaje = "Inicio de sesión exitoso", usuario = usuario });
-        }
-
-
+        // PUT: api/usuarios/cambiarContrasena
         [HttpPut("cambiarContrasena")]
+        [Authorize]  // Agregar [Authorize] para proteger la ruta
         public async Task<IActionResult> CambiarContrasena([FromBody] CambiarContrasenaModel cambiarModel)
         {
             // Validación de los datos
@@ -119,13 +92,12 @@ namespace Login.Controllers
             }
 
             // Actualizar la contraseña del usuario
-            usuario.UsuContrasenia = cambiarModel.NuevaContrasena; // Aquí podrías aplicar un hash de contraseña si lo deseas en el futuro
+            usuario.UsuContrasenia = cambiarModel.NuevaContrasena;
 
             _context.Usuarios.Update(usuario);
             await _context.SaveChangesAsync();
 
             return Ok(new { mensaje = "Contraseña cambiada con éxito." });
         }
-
     }
 }
