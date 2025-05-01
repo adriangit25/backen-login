@@ -1,14 +1,25 @@
-import React, { useState } from "react";
-import { createRegistro } from "../services/api"; // Asegúrate de que la ruta sea correcta
+import React, { useState, useEffect } from "react";
+import { createRegistro } from "../services/api"; // Asegúrate de que esta función esté correctamente configurada
+import { useNavigate } from "react-router-dom";
 
 const NewRegister = () => {
+  const navigate = useNavigate(); // Para redirigir al login si no hay token
   const [registerDetails, setRegisterDetails] = useState({
-    nombre: "",
-    apellido: "",
-    telefono: "",
-    fechaNacimiento: "",
+    regId: "",  // El ID del registro
+    regNombre: "",
+    regApellido: "",
+    regTelefono: "",
+    regFechaNacimiento: "",
+    regEstado: 1,  // Suponiendo que el estado es "1" por defecto
   });
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");  // Redirigir al login si no hay token
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,7 +29,7 @@ const NewRegister = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Aquí puedes agregar lógica para crear un nuevo registro en la base de datos
+      // Aquí estamos enviando el regId junto con los demás detalles
       await createRegistro(registerDetails);
       window.location.href = "/dashboard"; // Redirigir al dashboard después de registrar
     } catch (err) {
@@ -34,9 +45,20 @@ const NewRegister = () => {
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
               <input
+                type="number"
+                name="regId"
+                value={registerDetails.regId}
+                onChange={handleChange}
+                className="form-control"
+                placeholder="ID (RegId)"
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <input
                 type="text"
-                name="nombre"
-                value={registerDetails.nombre}
+                name="regNombre"
+                value={registerDetails.regNombre}
                 onChange={handleChange}
                 className="form-control"
                 placeholder="Nombre"
@@ -46,8 +68,8 @@ const NewRegister = () => {
             <div className="mb-3">
               <input
                 type="text"
-                name="apellido"
-                value={registerDetails.apellido}
+                name="regApellido"
+                value={registerDetails.regApellido}
                 onChange={handleChange}
                 className="form-control"
                 placeholder="Apellido"
@@ -57,8 +79,8 @@ const NewRegister = () => {
             <div className="mb-3">
               <input
                 type="text"
-                name="telefono"
-                value={registerDetails.telefono}
+                name="regTelefono"
+                value={registerDetails.regTelefono}
                 onChange={handleChange}
                 className="form-control"
                 placeholder="Teléfono"
@@ -68,8 +90,8 @@ const NewRegister = () => {
             <div className="mb-3">
               <input
                 type="text"
-                name="fechaNacimiento"
-                value={registerDetails.fechaNacimiento}
+                name="regFechaNacimiento"
+                value={registerDetails.regFechaNacimiento}
                 onChange={handleChange}
                 className="form-control"
                 placeholder="Fecha de Nacimiento (YYYY-MM-DD)"

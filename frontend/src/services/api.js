@@ -25,7 +25,7 @@ const setAuthToken = (token) => {
 export const getUsuarios = async () => {
   try {
     setAuthToken(getToken());  // Añadir el token a la solicitud
-    const response = await api.get('/usuarios');
+    const response = await api.get('/Usuarios');
     return response.data;
   } catch (error) {
     console.error('Error obteniendo los usuarios:', error);
@@ -48,7 +48,7 @@ export const getRegistros = async () => {
 // Función para registrar un nuevo usuario
 export const registerUser = async (userData) => {
   try {
-    const response = await api.post('/crearUsuario', userData); // Endpoint ajustado a tu controlador
+    const response = await api.post('/Usuarios/crearUsuario', userData); // Endpoint ajustado a tu controlador
     return response.data;
   } catch (error) {
     console.error('Error registrando el usuario:', error);
