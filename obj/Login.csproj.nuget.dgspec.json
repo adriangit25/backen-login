@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\adria\\BackendLogin\\Login\\Login.csproj": {}
+    "C:\\Users\\JeanR\\Documents\\GitHub\\backen-login-v2\\Login.csproj": {}
   },
   "projects": {
-    "C:\\Users\\adria\\BackendLogin\\Login\\Login.csproj": {
+    "C:\\Users\\JeanR\\Documents\\GitHub\\backen-login-v2\\Login.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\adria\\BackendLogin\\Login\\Login.csproj",
+        "projectUniqueName": "C:\\Users\\JeanR\\Documents\\GitHub\\backen-login-v2\\Login.csproj",
         "projectName": "Login",
-        "projectPath": "C:\\Users\\adria\\BackendLogin\\Login\\Login.csproj",
-        "packagesPath": "C:\\Users\\adria\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\adria\\BackendLogin\\Login\\obj\\",
+        "projectPath": "C:\\Users\\JeanR\\Documents\\GitHub\\backen-login-v2\\Login.csproj",
+        "packagesPath": "C:\\Users\\JeanR\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\JeanR\\Documents\\GitHub\\backen-login-v2\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\adria\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\JeanR\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -90,7 +90,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.204/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
