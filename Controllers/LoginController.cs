@@ -41,16 +41,21 @@ namespace Login.Controllers
             if (usuario.RolId == null || usuario.Rol == null)
                 return Forbid("Usuario sin rol asignado. Contacte al administrador.");
 
-            var rolNombre = usuario.Rol.RolNombre;
+            // Validación segura de nombre de rol
+            if (string.IsNullOrEmpty(usuario.Rol.RolNombre))
+                return Forbid("El usuario tiene un rol inválido o sin nombre.");
+            var rolNombre = usuario.Rol.RolNombre!;
 
             var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, usuario.UsuId.ToString()),
-                new Claim(ClaimTypes.Name, usuario.UsuCorreo!),
-                new Claim(ClaimTypes.Role, rolNombre) // Ahora es dinámico por nombre
-            };
+    {
+        new Claim(ClaimTypes.NameIdentifier, usuario.UsuId.ToString()),
+        new Claim(ClaimTypes.Name, usuario.UsuCorreo!),
+        new Claim(ClaimTypes.Role, rolNombre)
+    };
 
             var secretKey = _configuration["Jwt:SecretKey"];
+            if (string.IsNullOrEmpty(secretKey))
+                throw new InvalidOperationException("La clave secreta JWT no está configurada.");
             var key = Encoding.UTF8.GetBytes(secretKey);
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -73,5 +78,6 @@ namespace Login.Controllers
                 usuarioId = usuario.UsuId
             });
         }
+
     }
 }
