@@ -24,19 +24,16 @@ namespace Login.Controllers
         public async Task<ActionResult<IEnumerable<Usuario>>> GetUsuarios()
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-            var userRoleClaim = User.FindFirst(ClaimTypes.Role);
-            int? userRole = userRoleClaim != null && !string.IsNullOrEmpty(userRoleClaim.Value)
-                ? int.Parse(userRoleClaim.Value)
-                : (int?)null;
+            var userRoleName = User.FindFirst(ClaimTypes.Role)?.Value;
 
-            if (userRole == 1) // Administrador
+            if (userRoleName == "Administrador")
             {
                 return await _context.Usuarios
                     .Include(u => u.Registro)
                     .Include(u => u.Rol)
                     .ToListAsync();
             }
-            else if (userRole != null) // Empleado con rol válido
+            else if (userRoleName == "Empleado")
             {
                 var usuario = await _context.Usuarios
                     .Include(u => u.Registro)
@@ -47,7 +44,7 @@ namespace Login.Controllers
             }
             else
             {
-                return Forbid("Usuario sin rol. No puede acceder a esta información.");
+                return Forbid("Usuario sin permisos.");
             }
         }
 
@@ -57,16 +54,13 @@ namespace Login.Controllers
         public async Task<ActionResult<IEnumerable<Registro>>> GetRegistros()
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-            var userRoleClaim = User.FindFirst(ClaimTypes.Role);
-            int? userRole = userRoleClaim != null && !string.IsNullOrEmpty(userRoleClaim.Value)
-                ? int.Parse(userRoleClaim.Value)
-                : (int?)null;
+            var userRoleName = User.FindFirst(ClaimTypes.Role)?.Value;
 
-            if (userRole == 1) // Administrador ve todos
+            if (userRoleName == "Administrador")
             {
                 return await _context.Registros.ToListAsync();
             }
-            else if (userRole != null)
+            else if (userRoleName == "Empleado")
             {
                 var usuario = await _context.Usuarios.FindAsync(userId);
                 if (usuario == null || usuario.UsuRegistroId == null)
@@ -79,7 +73,7 @@ namespace Login.Controllers
             }
             else
             {
-                return Forbid("Usuario sin rol. No puede acceder a esta información.");
+                return Forbid("Usuario sin permisos.");
             }
         }
 
@@ -88,18 +82,14 @@ namespace Login.Controllers
         [Authorize]
         public async Task<ActionResult<Usuario>> CrearUsuario([FromBody] Usuario nuevoUsuario)
         {
-            var userRoleClaim = User.FindFirst(ClaimTypes.Role);
-            int? userRole = userRoleClaim != null && !string.IsNullOrEmpty(userRoleClaim.Value)
-                ? int.Parse(userRoleClaim.Value)
-                : (int?)null;
+            var userRoleName = User.FindFirst(ClaimTypes.Role)?.Value;
 
-            if (userRole != 1)
+            if (userRoleName != "Administrador")
                 return Forbid("Solo un administrador puede crear usuarios.");
 
             if (nuevoUsuario == null)
                 return BadRequest("Datos de usuario inválidos.");
 
-            // Se permite crear usuario con o sin rol asignado
             _context.Usuarios.Add(nuevoUsuario);
             await _context.SaveChangesAsync();
 
@@ -125,12 +115,9 @@ namespace Login.Controllers
         [Authorize]
         public async Task<IActionResult> AsignarRol([FromBody] AsignarRolModel model)
         {
-            var userRoleClaim = User.FindFirst(ClaimTypes.Role);
-            int? userRole = userRoleClaim != null && !string.IsNullOrEmpty(userRoleClaim.Value)
-                ? int.Parse(userRoleClaim.Value)
-                : (int?)null;
+            var userRoleName = User.FindFirst(ClaimTypes.Role)?.Value;
 
-            if (userRole != 1)
+            if (userRoleName != "Administrador")
                 return Forbid("Solo un administrador puede asignar roles.");
 
             if (model == null || model.UsuarioId == 0 || model.RolId == 0)
@@ -149,6 +136,13 @@ namespace Login.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(new { mensaje = $"Rol asignado correctamente a {usuario.UsuCorreo}." });
+        }
+
+        // GET: api/usuarios/roles
+        [HttpGet("roles")]
+        public async Task<ActionResult<IEnumerable<Rol>>> GetRoles()
+        {
+            return await _context.Set<Rol>().ToListAsync();
         }
 
         // PUT: api/usuarios/cambiarContrasena
